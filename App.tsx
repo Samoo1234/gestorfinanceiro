@@ -11,6 +11,7 @@ import IncomeManagement from './components/IncomeManagement';
 import Reports from './components/Reports';
 import Settings from './components/Settings';
 import MobileMenu from './components/MobileMenu';
+import AIChatDialog from './components/AIChatDialog';
 import { supabase } from './supabase';
 import { parseDate, getTodayString } from './utils';
 
@@ -423,6 +424,13 @@ const App: React.FC = () => {
             <button className="text-[10px] md:text-xs text-slate-500 hover:text-primary transition-colors">Ajuda</button>
           </div>
         </footer>
+
+        {/* Assistente Financeiro IA */}
+        <AIChatDialog
+          accounts={accounts}
+          incomes={incomes}
+          userName={userProfile?.name}
+        />
       </main>
     </div>
   );
