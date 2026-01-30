@@ -75,8 +75,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         <button
                             onClick={() => handleNavigate('dashboard')}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'dashboard'
-                                    ? 'bg-primary/10 text-primary'
-                                    : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                                 }`}
                         >
                             <span className="material-symbols-outlined">home</span>
@@ -84,21 +84,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         </button>
 
                         <button
-                            onClick={() => handleNavigate('add-account')}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'add-account'
-                                    ? 'bg-primary/10 text-primary'
-                                    : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                                }`}
-                        >
-                            <span className="material-symbols-outlined">receipt_long</span>
-                            <span className="font-medium">Contas</span>
-                        </button>
-
-                        <button
                             onClick={() => handleNavigate('incomes')}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'incomes'
-                                    ? 'bg-emerald-500/10 text-emerald-600'
-                                    : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                ? 'bg-emerald-500/10 text-emerald-600'
+                                : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                                 }`}
                         >
                             <span className="material-symbols-outlined">account_balance_wallet</span>
@@ -106,10 +95,21 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         </button>
 
                         <button
+                            onClick={() => handleNavigate('add-account')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'add-account'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
+                        >
+                            <span className="material-symbols-outlined">receipt_long</span>
+                            <span className="font-medium">Contas</span>
+                        </button>
+
+                        <button
                             onClick={() => handleNavigate('reports')}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'reports'
-                                    ? 'bg-primary/10 text-primary'
-                                    : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                                 }`}
                         >
                             <span className="material-symbols-outlined">bar_chart</span>
@@ -121,8 +121,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         <button
                             onClick={() => handleNavigate('settings')}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'settings'
-                                    ? 'bg-primary/10 text-primary'
-                                    : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                                 }`}
                         >
                             <span className="material-symbols-outlined">settings</span>
