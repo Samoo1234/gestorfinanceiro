@@ -25,6 +25,10 @@ const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const [statusFilter, setStatusFilter] = useState<AccountStatus | 'All'>('All');
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
+  const [monthFilter, setMonthFilter] = useState<string>(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
   const [currentPage, setCurrentPage] = useState(1);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -49,6 +53,15 @@ const Dashboard: React.FC<DashboardProps> = ({
   // Category filter
   if (categoryFilter !== 'All') {
     filteredAccounts = filteredAccounts.filter(acc => acc.category === categoryFilter);
+  }
+
+  // Month filter
+  if (monthFilter !== 'All') {
+    const [year, month] = monthFilter.split('-').map(Number);
+    filteredAccounts = filteredAccounts.filter(acc => {
+      const accDate = parseDate(acc.dueDate);
+      return accDate.getFullYear() === year && (accDate.getMonth() + 1) === month;
+    });
   }
 
   // Pagination
@@ -95,6 +108,87 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const handlePageChange = (page: number) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const handlePrintReport = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const reportMonth = monthFilter === 'All' ? 'Geral' : monthFilter;
+    const totalMonth = filteredAccounts.reduce((sum, acc) => sum + (Number(acc.installmentValue) || 0), 0);
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Relatório de Contas a Pagar - ${reportMonth}</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #333; }
+          h1 { color: #137fec; border-bottom: 2px solid #137fec; padding-bottom: 10px; margin-bottom: 5px; }
+          .subtitle { color: #666; margin-bottom: 30px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #eee; padding: 12px 15px; text-align: left; }
+          th { background: #f8fafc; color: #475569; font-weight: bold; text-transform: uppercase; font-size: 12px; }
+          tr:nth-child(even) { background-color: #fcfcfc; }
+          .value-col { text-align: right; font-family: monospace; font-weight: bold; }
+          .total-row { background: #f1f5f9 !important; font-weight: bold; }
+          .footer { margin-top: 40px; text-align: center; color: #94a3b8; font-size: 11px; border-top: 1px solid #eee; padding-top: 20px; }
+          @media print {
+            body { padding: 0; }
+            button { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>📄 Relatório de Contas a Pagar</h1>
+        <div class="subtitle">
+          <p><strong>Mês de Referência:</strong> ${reportMonth}</p>
+          <p><strong>Data de Emissão:</strong> ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</p>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Vencimento</th>
+              <th>Parcela</th>
+              <th style="text-align: right;">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filteredAccounts.map(acc => `
+              <tr>
+                <td>${acc.companyName}</td>
+                <td>${formatDate(acc.dueDate)}</td>
+                <td>${acc.installments}</td>
+                <td class="value-col">${formatCurrency(acc.installmentValue)}</td>
+              </tr>
+            `).join('')}
+            ${filteredAccounts.length === 0 ? '<tr><td colspan="4" style="text-align:center;">Nenhuma conta encontrada para o período selecionado.</td></tr>' : ''}
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="3" style="text-align: right;">TOTAL:</td>
+              <td class="value-col">${formatCurrency(totalMonth)}</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="footer">
+          <p>GestorFinanceiro Pro - Sistema de Gestão Financeira Inteligente</p>
+        </div>
+        <script>
+          window.onload = () => {
+            window.print();
+            // window.close(); // Opcional: fechar após imprimir
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
   };
 
   return (
@@ -183,6 +277,37 @@ const Dashboard: React.FC<DashboardProps> = ({
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
+
+          {/* Month Filter */}
+          <div className="flex items-center gap-2">
+            <input
+              type="month"
+              value={monthFilter === 'All' ? '' : monthFilter}
+              onChange={(e) => {
+                const val = e.target.value;
+                setMonthFilter(val || 'All');
+                setCurrentPage(1);
+              }}
+              className="h-9 rounded-lg bg-white dark:bg-slate-800 border border-[#cfdbe7] dark:border-slate-700 px-3 text-sm text-[#0d141b] dark:text-white focus:ring-2 focus:ring-primary/20 outline-none"
+            />
+            {monthFilter !== 'All' && (
+              <button
+                onClick={() => { setMonthFilter('All'); setCurrentPage(1); }}
+                className="text-xs text-primary hover:underline font-bold"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+
+          {/* Print Button */}
+          <button
+            onClick={handlePrintReport}
+            className="flex items-center gap-2 px-4 h-9 bg-primary hover:bg-primary-hover text-white rounded-lg transition-all font-bold text-xs shadow-sm active:scale-95"
+          >
+            <span className="material-symbols-outlined text-[18px]">print</span>
+            Imprimir Relatório
+          </button>
         </div>
 
         {/* View Toggle */}
@@ -337,8 +462,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
                     className={`px-3 py-1 rounded text-sm font-medium transition-colors ${currentPage === pageNum
-                        ? 'bg-primary text-white shadow-sm'
-                        : 'text-[#4c739a] hover:bg-white dark:hover:bg-slate-800'
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'text-[#4c739a] hover:bg-white dark:hover:bg-slate-800'
                       }`}
                   >
                     {pageNum}
