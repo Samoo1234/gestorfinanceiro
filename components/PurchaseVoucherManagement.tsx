@@ -26,12 +26,19 @@ const PurchaseVoucherManagement: React.FC<PurchaseVoucherManagementProps> = ({ v
 
     const totals = useMemo(() => {
         return filteredVouchers.reduce((acc, curr) => {
-            if (curr.type === 'purchase') acc.purchases += Number(curr.amount);
+            if (curr.type === 'purchase') {
+                acc.purchases += Number(curr.amount);
+                acc.purchaseCount += 1;
+            }
             else acc.vouchers += Number(curr.amount);
             acc.total += Number(curr.amount);
             return acc;
-        }, { purchases: 0, vouchers: 0, total: 0 });
+        }, { purchases: 0, vouchers: 0, total: 0, purchaseCount: 0 });
     }, [filteredVouchers]);
+
+    const averagePurchase = useMemo(() => {
+        return totals.purchaseCount > 0 ? totals.purchases / totals.purchaseCount : 0;
+    }, [totals.purchases, totals.purchaseCount]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -91,16 +98,20 @@ const PurchaseVoucherManagement: React.FC<PurchaseVoucherManagementProps> = ({ v
                     </div>
                 </div>
 
-                <div className="md:col-span-2 grid grid-cols-3 gap-4">
+                <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-2xl border border-orange-100 dark:border-orange-800/30">
                         <p className="text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider mb-1">Compras</p>
                         <p className="text-xl font-bold text-orange-700 dark:text-orange-300">{formatCurrency(totals.purchases)}</p>
+                    </div>
+                    <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-2xl border border-amber-100 dark:border-amber-800/30">
+                        <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">Média Compras</p>
+                        <p className="text-xl font-bold text-amber-700 dark:text-amber-300">{formatCurrency(averagePurchase)}</p>
                     </div>
                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-100 dark:border-blue-800/30">
                         <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">Vales</p>
                         <p className="text-xl font-bold text-blue-700 dark:text-blue-300">{formatCurrency(totals.vouchers)}</p>
                     </div>
-                    <div className="bg-slate-900 dark:bg-slate-800 p-4 rounded-2xl border border-slate-800 shadow-lg">
+                    <div className="bg-slate-900 dark:bg-slate-800 p-4 rounded-2xl border border-slate-800 shadow-lg col-span-2 md:col-span-1">
                         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Geral</p>
                         <p className="text-xl font-bold text-white">{formatCurrency(totals.total)}</p>
                     </div>
