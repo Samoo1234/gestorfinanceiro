@@ -40,7 +40,17 @@ export interface Income {
   received: boolean;
 }
 
-export type ViewType = 'dashboard' | 'add-account' | 'login' | 'incomes' | 'add-income' | 'reports' | 'register' | 'settings' | 'reset-password';
+export interface PurchaseVoucher {
+  id: string;
+  user_id: string;
+  type: 'purchase' | 'voucher';
+  description: string;
+  amount: number;
+  date: string;
+  created_at?: string;
+}
+
+export type ViewType = 'dashboard' | 'add-account' | 'login' | 'incomes' | 'add-income' | 'reports' | 'register' | 'settings' | 'reset-password' | 'purchases-vouchers';
 
 export interface DashboardStats {
   totalOpen: number;

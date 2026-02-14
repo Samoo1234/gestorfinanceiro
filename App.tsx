@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ViewType, Account, AccountStatus, Income, UserProfile } from './types';
+import { ViewType, Account, AccountStatus, Income, UserProfile, PurchaseVoucher } from './types';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
@@ -12,13 +12,15 @@ import Reports from './components/Reports';
 import Settings from './components/Settings';
 import MobileMenu from './components/MobileMenu';
 import AIChatDialog from './components/AIChatDialog';
+import PurchaseVoucherManagement from './components/PurchaseVoucherManagement';
 import { supabase } from './supabase';
-import { parseDate, getTodayString } from './utils';
+import { parseDate, getTodayString, toYMD } from './utils';
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewType>('login');
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
+  const [purchaseVouchers, setPurchaseVouchers] = useState<PurchaseVoucher[]>([]);
   const [session, setSession] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -33,6 +35,7 @@ const App: React.FC = () => {
         setView('dashboard');
         fetchIncomes(session.user.id);
         fetchAccounts(session.user.id);
+        fetchPurchaseVouchers(session.user.id);
         fetchProfile(session.user.id);
       }
     });
@@ -44,6 +47,7 @@ const App: React.FC = () => {
         setView('dashboard');
         fetchIncomes(session.user.id);
         fetchAccounts(session.user.id);
+        fetchPurchaseVouchers(session.user.id);
         fetchProfile(session.user.id);
       } else {
         setView('login');
@@ -94,6 +98,18 @@ const App: React.FC = () => {
 
     if (!error && data) {
       setIncomes(data);
+    }
+  };
+
+  const fetchPurchaseVouchers = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('purchase_vouchers')
+      .select('*')
+      .eq('user_id', userId)
+      .order('date', { ascending: false });
+
+    if (!error && data) {
+      setPurchaseVouchers(data);
     }
   };
 
@@ -176,7 +192,7 @@ const App: React.FC = () => {
         total_value: newAccountData.totalValue,
         installments: `${i + 1} / ${totalInstallments}`,
         installment_value: newAccountData.installmentValue,
-        due_date: dueDate.toISOString().split('T')[0],
+        due_date: toYMD(dueDate),
         status: AccountStatus.PENDING,
         category: newAccountData.category || 'Outros',
         user_id: session.user.id
@@ -248,6 +264,33 @@ const App: React.FC = () => {
 
     if (!error) {
       setIncomes(incomes.filter(i => i.id !== id));
+    }
+  };
+
+  const handleAddPurchaseVoucher = async (data: Partial<PurchaseVoucher>) => {
+    if (!session) return;
+
+    const { data: newData, error } = await supabase
+      .from('purchase_vouchers')
+      .insert([{
+        ...data,
+        user_id: session.user.id
+      }])
+      .select();
+
+    if (!error && newData) {
+      setPurchaseVouchers([newData[0], ...purchaseVouchers]);
+    }
+  };
+
+  const handleDeletePurchaseVoucher = async (id: string) => {
+    const { error } = await supabase
+      .from('purchase_vouchers')
+      .delete()
+      .eq('id', id);
+
+    if (!error) {
+      setPurchaseVouchers(purchaseVouchers.filter(v => v.id !== id));
     }
   };
 
@@ -364,6 +407,14 @@ const App: React.FC = () => {
             onDeleteIncome={handleDeleteIncome}
             onToggleReceived={handleToggleIncomeReceived}
             onEditIncome={handleEditIncome}
+          />
+        );
+      case 'purchases-vouchers':
+        return (
+          <PurchaseVoucherManagement
+            vouchers={purchaseVouchers}
+            onAdd={handleAddPurchaseVoucher}
+            onDelete={handleDeletePurchaseVoucher}
           />
         );
       case 'add-account':

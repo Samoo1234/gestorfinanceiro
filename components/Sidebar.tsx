@@ -58,6 +58,17 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, onLogout }) 
           </button>
 
           <button
+            onClick={() => onNavigate('purchases-vouchers')}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all group ${currentView === 'purchases-vouchers'
+              ? 'bg-orange-500/10 text-orange-600'
+              : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+          >
+            <span className={`material-symbols-outlined text-[20px] ${currentView === 'purchases-vouchers' ? 'text-orange-600' : 'text-[#4c739a] group-hover:text-orange-600'}`}>shopping_basket</span>
+            <span>Compras e Vales</span>
+          </button>
+
+          <button
             onClick={() => onNavigate('reports')}
             className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all group ${currentView === 'reports'
               ? 'bg-primary/10 text-primary'

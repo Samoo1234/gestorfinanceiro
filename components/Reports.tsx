@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Account, Income, AccountStatus } from '../types';
-import { formatCurrency, formatDate } from '../utils';
+import { formatCurrency, formatDate, parseDate } from '../utils';
 
 interface ReportsProps {
     accounts: Account[];
@@ -18,12 +18,12 @@ const Reports: React.FC<ReportsProps> = ({ accounts, incomes }) => {
         const [year, month] = selectedMonth.split('-').map(Number);
 
         const monthAccounts = accounts.filter(acc => {
-            const accDate = new Date(acc.dueDate + 'T00:00:00');
+            const accDate = parseDate(acc.dueDate);
             return accDate.getFullYear() === year && (accDate.getMonth() + 1) === month;
         });
 
         const monthIncomes = incomes.filter(inc => {
-            const incDate = new Date(inc.date + 'T00:00:00');
+            const incDate = parseDate(inc.date);
             return incDate.getFullYear() === year && (incDate.getMonth() + 1) === month;
         });
 

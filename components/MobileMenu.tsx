@@ -106,6 +106,17 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         </button>
 
                         <button
+                            onClick={() => handleNavigate('purchases-vouchers')}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'purchases-vouchers'
+                                ? 'bg-orange-500/10 text-orange-600'
+                                : 'text-[#0d141b] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
+                        >
+                            <span className="material-symbols-outlined">shopping_basket</span>
+                            <span className="font-medium">Compras e Vales</span>
+                        </button>
+
+                        <button
                             onClick={() => handleNavigate('reports')}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${currentView === 'reports'
                                 ? 'bg-primary/10 text-primary'
